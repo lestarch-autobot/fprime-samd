@@ -48,13 +48,23 @@ set(TOOLCHAIN_BIN "${TOOLCHAIN_ROOT}/bin")
 set(CMAKE_C_COMPILER "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc")
 set(CMAKE_CXX_COMPILER "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}g++")
 set(CMAKE_ASM_COMPILER "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc")
-set(CMAKE_AR "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}ar")
+# The link is -flto. GCC 13 slim LTO objects carry no ELF symbol table, so a plain `ar`
+# index misses every symbol and the final link fails with hundreds of undefined references;
+# the gcc-ar/gcc-ranlib/gcc-nm wrappers load the LTO plugin. Fall back to plain tools when
+# the wrappers are absent.
+if(EXISTS "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc-ar")
+    set(CMAKE_AR "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc-ar")
+    set(CMAKE_RANLIB "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc-ranlib")
+    set(CMAKE_NM "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}gcc-nm")
+else()
+    set(CMAKE_AR "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}ar")
+    set(CMAKE_RANLIB "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}ranlib")
+    set(CMAKE_NM "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}nm")
+endif()
 set(CMAKE_LINKER "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}g++")
 set(CMAKE_OBJCOPY "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}objcopy")
 set(CMAKE_OBJDUMP "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}objdump")
-set(CMAKE_NM "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}nm")
 set(CMAKE_SIZE "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}size")
-set(CMAKE_RANLIB "${TOOLCHAIN_BIN}/${TOOLCHAIN_PREFIX}ranlib")
 
 # CMake needs this for try_compile to work
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
