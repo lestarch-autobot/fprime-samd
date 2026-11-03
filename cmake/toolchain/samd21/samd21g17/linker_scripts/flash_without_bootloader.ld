@@ -104,6 +104,15 @@ SECTIONS
 	} > FLASH
 	__exidx_end = .;
 
+	/* GCC >= 11 -fprofile-info-section: one struct gcov_info pointer per instrumented object,
+	 * walked by the on-target dump (__gcov_info_to_gcda). KEEP: nothing references it. */
+	.gcov_info :
+	{
+		PROVIDE (__gcov_info_start = .);
+		KEEP(*(.gcov_info))
+		PROVIDE (__gcov_info_end = .);
+	} > FLASH
+
 	__etext = .;
 
 	.relocate : AT (__etext)
