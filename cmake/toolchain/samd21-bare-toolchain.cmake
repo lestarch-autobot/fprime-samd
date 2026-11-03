@@ -17,8 +17,20 @@ cmake_minimum_required(VERSION 3.19)
 # Toolchain paths - check multiple locations for arm-none-eabi-gcc
 set(TOOLCHAIN_PREFIX "arm-none-eabi-")
 
+# Override: -DSAMD_TOOLCHAIN_ROOT=<dir> (cache) or SAMD_TOOLCHAIN_ROOT=<dir> (env) names a toolchain
+# install whose bin/ holds arm-none-eabi-*; otherwise the Arduino-CLI locations below are searched.
+set(SAMD_TOOLCHAIN_ROOT "" CACHE PATH "arm-none-eabi toolchain root (bin/arm-none-eabi-gcc); empty = Arduino-CLI install")
+if(NOT SAMD_TOOLCHAIN_ROOT AND DEFINED ENV{SAMD_TOOLCHAIN_ROOT})
+    set(SAMD_TOOLCHAIN_ROOT "$ENV{SAMD_TOOLCHAIN_ROOT}")
+endif()
+
 # Check for toolchain in various install locations
-if(EXISTS "$ENV{HOME}/Library/Arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4")
+if(SAMD_TOOLCHAIN_ROOT)
+    if(NOT EXISTS "${SAMD_TOOLCHAIN_ROOT}/bin/${TOOLCHAIN_PREFIX}gcc")
+        message(FATAL_ERROR "SAMD_TOOLCHAIN_ROOT=${SAMD_TOOLCHAIN_ROOT}: no bin/${TOOLCHAIN_PREFIX}gcc there")
+    endif()
+    set(TOOLCHAIN_ROOT "${SAMD_TOOLCHAIN_ROOT}")
+elseif(EXISTS "$ENV{HOME}/Library/Arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4")
     set(TOOLCHAIN_ROOT "$ENV{HOME}/Library/Arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4")
 elseif(EXISTS "$ENV{HOME}/.arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4")
     set(TOOLCHAIN_ROOT "$ENV{HOME}/.arduino15/packages/adafruit/tools/arm-none-eabi-gcc/9-2019q4")
