@@ -56,6 +56,20 @@ if (SAMD21_LTO)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
+    # GCC 9 keeps the plugin under lib/gcc/, so --print-file-name answers with a path; newer
+    # releases (Arm GNU 13.3) keep it under libexec/gcc/ and answer with the bare name, which
+    # ar/ranlib then cannot load, so every archive index silently misses its LTO symbols and the
+    # final link fails with hundreds of undefined references. --print-prog-name searches libexec.
+    if(NOT IS_ABSOLUTE "${LTO_PLUGIN}" OR NOT EXISTS "${LTO_PLUGIN}")
+        execute_process(
+            COMMAND ${CMAKE_C_COMPILER} --print-prog-name=liblto_plugin.so
+            OUTPUT_VARIABLE LTO_PLUGIN
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+    endif()
+    if(NOT EXISTS "${LTO_PLUGIN}")
+        message(FATAL_ERROR "[samd21] LTO plugin not found via ${CMAKE_C_COMPILER} (got '${LTO_PLUGIN}')")
+    endif()
     message(STATUS "[samd21] Detected LTO plugin: ${LTO_PLUGIN}")
 
     set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> --plugin=${LTO_PLUGIN} <TARGET>")
