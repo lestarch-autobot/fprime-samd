@@ -147,6 +147,19 @@ SECTIONS
 
 	} > RAM
 
+	/* gcov arc counters (-fprofile-arcs, .bss.__gcov0.*) and the dump's identity word, kept out of
+	 * .bss so the startup code does not zero them: they survive a warm reset (the FRAM plan resets
+	 * the MCU mid-run). The instrumented build zeroes them itself on a cold start / image change. */
+	.gcov_counters (NOLOAD) :
+	{
+		. = ALIGN(4);
+		PROVIDE (__gcov_counters_start = .);
+		*(.gcov_counters*)
+		*(.bss.__gcov0*)
+		. = ALIGN(4);
+		PROVIDE (__gcov_counters_end = .);
+	} > RAM
+
 	.bss :
 	{
 		. = ALIGN(4);
