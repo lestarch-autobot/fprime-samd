@@ -31,10 +31,14 @@ using Mutex = Os::Samd21::Mutex;
 using ConditionVariable = Os::Stub::Mutex::StubConditionVariable;
 using RawTime = Os::Samd21::RawTime;
 
+class DelegateConsole;
+using Console = DelegateConsole;
+
 }  // namespace Os
 
 #define OS_RAW_TIME_HEADER "fprime-samd/Drv/RtcDriver/RawTime.hpp"
 #define OS_MUTEX_HEADER "fprime-samd/Os/Mutex.hpp"
 #define OS_CONDITION_VARIABLE_HEADER "Os/Stub/ConditionVariable.hpp"
+#define OS_CONSOLE_HEADER <Os/DelegateConsole.hpp>
 
 #endif  // CONFIG_OSSELECTION_HPP
