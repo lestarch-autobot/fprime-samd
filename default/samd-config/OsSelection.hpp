@@ -31,10 +31,14 @@ using Mutex = Os::Samd21::Mutex;
 using ConditionVariable = Os::Stub::Mutex::StubConditionVariable;
 using RawTime = Os::Samd21::RawTime;
 
+class DelegateCountingSemaphore;
+using CountingSemaphore = DelegateCountingSemaphore;
+
 }  // namespace Os
 
 #define OS_RAW_TIME_HEADER "fprime-samd/Drv/RtcDriver/RawTime.hpp"
 #define OS_MUTEX_HEADER "fprime-samd/Os/Mutex.hpp"
 #define OS_CONDITION_VARIABLE_HEADER "Os/Stub/ConditionVariable.hpp"
+#define OS_COUNTING_SEMAPHORE_HEADER <Os/DelegateCountingSemaphore.hpp>
 
 #endif  // CONFIG_OSSELECTION_HPP
