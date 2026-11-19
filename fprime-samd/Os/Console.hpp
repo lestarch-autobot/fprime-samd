@@ -37,6 +37,9 @@ class StreamConsole : public ConsoleInterface {
     // Functions overrides
     // ------------------------------------
 
+    // The override below would otherwise hide the common writeMessage overloads defined on ConsoleInterface
+    using ConsoleInterface::writeMessage;
+
     //! \brief write message to console
     //!
     //! Write a message to the console with a bounded size. This will use the active file descriptor as the output
